@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groove.sh</title>
+    <style>
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        } 
+        body {
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+        #player {
+            width: 320px;
+            background-color: rgba(224, 224, 224, 0.9);
+            border: 2px solid #000;
+            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
+        }
+        #header {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 5px;
+            border-bottom: 2px solid #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #close-button {
+            width: 15px;
+            height: 15px;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        #title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #visitor-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #000;
+            color: #fff;
+            padding: 2px 5px;
+            font-size: 14px;
+            border: 1px solid #fff;
+        }
+        #progress-bar {
+            height: 20px;
+            background-color: #000;
+            margin: 10px;
+            border: 2px solid #000;
+            box-sizing: border-box;
+        }
+        #channel-select {
+            width: calc(100% - 20px);
+            margin: 10px;
+            padding: 5px;
+            font-family: 'Courier New', monospace;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #000;
+            font-size: 14px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath d='M0 2l4 4 4-4' fill='%23000000'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            cursor: pointer;
+        }
+        #channel-select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #000;
+        }
+        #track-info {
+            padding: 10px;
+            font-size: 14px;
+            height: 80px;
+            overflow: hidden;
+        }
+        #time {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        #track-name, #artist {
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #track-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        #controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+        .control-btn {
+            width: 60px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #000;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #volume-control {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-top: 2px solid #000;
+        }
+        #volume-label {
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        #volume-slider {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            width: 100%;
+            height: 20px;
+            background: #000;
+            outline: none;
+            border: 2px solid #000;
+            box-sizing: border-box;
+        }
+        #volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            cursor: pointer;
+            border: 2px solid #000;
+            box-sizing: border-box;
+        }
+        #volume-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            cursor: pointer;
+            border: 2px solid #000;
+            box-sizing: border-box;
+        }        
+    </style>
+</head>
+<body>
+    <div id="player">
+        <div id="header">
+            <div id="close-button">×</div>
+            <div id="title">Groove.sh</div>
+            <div></div>
+        </div>
+        <div id="visitor-count"> <span id="count">-</span></div>
+        <div id="progress-bar"></div>
+        <select id="channel-select">
+            <option value="">Loading genres...</option>
+        </select>
+        <div id="track-info">
+            <div id="time">00:00 / 00:00</div>
+            <h3 id="track-name">Loading...</h3>
+            <p id="artist">Loading...</p>
+        </div>
+        <div id="controls">
+            <button class="control-btn" id="playPauseBtn">Play</button>
+            <button class="control-btn" id="likeBtn">♡</button>
+            <button class="control-btn" id="shareBtn">↗</button>
+        </div>
+        <div id="volume-control">
+            <span id="volume-label">Volume</span>
+            <input type="range" id="volume-slider" min="0" max="100" value="100">
+        </div>        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sha1-uint8array/dist/sha1-uint8array.min.js"></script>
+    <script>
+        const audio = new Audio();
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const channelSelect = document.getElementById('channel-select');
+        const progressBar = document.getElementById('progress-bar');
+        const timeDisplay = document.getElementById('time');
+        const trackNameDisplay = document.getElementById('track-name');
+        const artistDisplay = document.getElementById('artist');
+        const volumeSlider = document.getElementById('volume-slider');
+        let isPlaying = false;
+        let currentGenre = '';
+        let fadeOutInterval;
+        let fadeInInterval;
+
+        const FADE_DURATION = 5000;
+        const CHECK_INTERVAL = 1000;
+        const PRELOAD_THRESHOLD = 10;
+
+        const artistNames = ['DJ Coolcat', 'Funky Flamingo', 'Retro Rhapsody', 'Neon Nights', 'Synth Serenity'];
+
+        const adjectives = ['Cosmic', 'Neon', 'Retro', 'Funk', 'Synth', 'Disco', 'Electric', 'Groovy', 'Smooth', 'Jazzy'];
+        const nouns = ['Wave', 'Beat', 'Rhythm', 'Groove', 'Sunset', 'Dream', 'Vibes', 'Fusion', 'Harmony', 'Pulse'];
+        const verbs = ['Dancing', 'Cruising', 'Floating', 'Riding', 'Chilling', 'Gliding', 'Soaring', 'Flowing', 'Grooving', 'Jamming'];
+
+        
+        function generateTrackName(hash) {
+            const adjective = adjectives[parseInt(hash.substr(0, 2), 16) % adjectives.length];
+            const noun = nouns[parseInt(hash.substr(2, 2), 16) % nouns.length];
+            const verb = verbs[parseInt(hash.substr(4, 2), 16) % verbs.length];
+            const trackNumber = parseInt(hash.substr(6, 2), 16) % 20 + 1;
+            return `${trackNumber.toString().padStart(2, '0')}. ${adjective} ${noun} (${verb} Mix)`;
+        }
+
+        function selectArtistName(hash) {
+            return artistNames[parseInt(hash.substr(8, 2), 16) % artistNames.length];
+        }        
+
+        async function fetchGenres() {
+            try {
+                const response = await fetch('/genres');
+                if (!response.ok) throw new Error('Failed to fetch genres');
+                const data = await response.json();
+                return data.genres;
+            } catch (error) {
+                console.error('Error fetching genres:', error);
+                return [];
+            }
+        }
+
+        async function populateGenreDropdown() {
+            const genres = await fetchGenres();
+            console.log(genres);
+            channelSelect.innerHTML = genres.map(genre => `<option value="${genre}">${genre}</option>`).join('');
+            console.log(channelSelect.innerHTML);
+            if (genres.length > 0) {
+                currentGenre = genres[0];
+                channelSelect.value = currentGenre;
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.background = `linear-gradient(to right, #fff ${progress}%, #000 ${progress}%)`;
+            
+            const currentTime = formatTime(audio.currentTime);
+            const duration = formatTime(audio.duration);
+            timeDisplay.textContent = `${currentTime} / ${duration}`;
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        async function loadTrack() {
+            const response = await fetch(`/${currentGenre}/current.mp3?t=${Date.now()}`);
+            if (!response.ok) throw new Error('Failed to fetch audio');
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            audio.src = url;
+            
+            // Calculate Sha1 hash of the audio blob for artist and track names
+            const arrayBuffer = await blob.arrayBuffer();
+            const uint8_arraybuffer = new Uint8Array(arrayBuffer);
+            const hashBuffer = SHA1.createHash().update(uint8_arraybuffer).digest();
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            // Update track info using the hash
+            updateTrackInfo(hashHex);
+        }
+
+        function updateTrackInfo(hash) {
+            trackNameDisplay.textContent = generateTrackName(hash);
+            artistDisplay.textContent = selectArtistName(hash);
+        }
+
+        async function loadAndPlayTrack(fadeIn = true) {
+            try {
+                await loadTrack();
+                if (fadeIn) {
+                    audio.volume = 0;
+                } else {
+                    audio.volume = volumeSlider.value / 100;
+                }
+                await audio.play();
+                isPlaying = true;
+                playPauseBtn.textContent = 'Pause';
+                if (fadeIn) {
+                    performFadeIn();
+                }
+            } catch (error) {
+                console.error('Error loading track:', error);
+            }
+        }
+
+        function updateVolume() {
+            audio.volume = volumeSlider.value / 100;
+        }
+
+        volumeSlider.addEventListener('input', updateVolume);
+
+        function performFadeOut() {
+            clearInterval(fadeOutInterval);
+            clearInterval(fadeInInterval);
+            
+            const maxVolume = volumeSlider.value / 100;
+            let volume = audio.volume;
+            fadeOutInterval = setInterval(() => {
+                volume = Math.max(0, volume - 0.05);
+                audio.volume = volume;
+                if (volume === 0) {
+                    clearInterval(fadeOutInterval);
+                    audio.pause();
+                    loadAndPlayTrack();
+                }
+            }, FADE_DURATION / 20);
+        }
+
+        function performFadeIn() {
+            clearInterval(fadeInInterval);
+            clearInterval(fadeOutInterval);
+            
+            const maxVolume = volumeSlider.value / 100;
+            let volume = 0;
+            audio.volume = volume;
+            fadeInInterval = setInterval(() => {
+                volume = Math.min(maxVolume, volume + 0.05);
+                audio.volume = volume;
+                if (volume === maxVolume) {
+                    clearInterval(fadeInInterval);
+                }
+            }, FADE_DURATION / 20);
+        }
+
+
+        function checkTimeAndPreload() {
+            if (audio.currentTime > 0 && audio.duration > 0) {
+                const timeLeft = audio.duration - audio.currentTime;
+                if (timeLeft <= PRELOAD_THRESHOLD) {
+                    performFadeOut();
+                }
+            }
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                playPauseBtn.textContent = 'Play';
+            } else {
+                if (audio.src) {
+                    audio.play();
+                    performFadeIn();
+                } else {
+                    loadAndPlayTrack(true);
+                }
+                isPlaying = true;
+                playPauseBtn.textContent = 'Pause';
+            }
+        });
+
+        channelSelect.addEventListener('change', (event) => {
+            currentGenre = event.target.value;
+            if (isPlaying) {
+                performFadeOut();
+            } else {
+                loadTrack();
+            }
+        });
+
+        audio.addEventListener('timeupdate', updateProgressBar);
+        audio.addEventListener('ended', () => loadAndPlayTrack(true));
+
+        setInterval(checkTimeAndPreload, CHECK_INTERVAL);
+
+        // Add WebSocket connection and visitor count update logic
+        const visitorCountElement = document.getElementById('count');
+        const socket = new WebSocket(`ws://${window.location.host}/ws`);
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.type === 'visitor_count') {
+                if (data.count > 1) {
+                    visitorCountElement.textContent = `${data.count} People grooving right now`;
+                } else {
+                    visitorCountElement.textContent = `${data.count} Person grooving right now`;
+                }
+            }
+        };
+
+        socket.onclose = function(event) {
+            console.log('WebSocket connection closed:', event);
+        };
+
+        // Initialize
+        populateGenreDropdown().then(() => {
+            if (currentGenre) {
+                loadTrack();
+            }
+        });
+        updateVolume();        
+    </script>
+</body>
+</html>

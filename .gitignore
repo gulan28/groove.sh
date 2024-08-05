@@ -1,0 +1,8 @@
+# Ignore all contents of the music directory
+music/*
+
+# But not the music directory itself
+!music/
+
+.env
+.DS_Store
