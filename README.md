@@ -1,6 +1,6 @@
 # Groove.sh
 
-[Groove.sh](images/groove.png)
+![Groove.sh](images/groove.png)
 
 Groove.sh plays AI generated music, infinitely. It uses stable-audio 1.0 for generation by making use of the FAL.ai api for it. It was inspired by https://github.com/kennethnym/infinifi
 
