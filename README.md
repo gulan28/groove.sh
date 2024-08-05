@@ -34,3 +34,8 @@ fastapi dev server.py --host 0.0.0.0 --port 8000
 ```
 
 You should be able to access your server at `localhost:8000`
+
+## Misc:
+
+Licensed under MIT license
+Thanks to @kennethnym for the inspiration.
