@@ -10,19 +10,17 @@ let isPlaying = false;
 let currentGenre = '';
 let fadeOutInterval;
 let fadeInInterval;
-let isLoadingTrack = false;  // New flag to prevent multiple loadAndPlayTrack calls
-
+let isLoadingTrack = false;
+let nextTrackInfo = null;
 
 const FADE_DURATION = 5000;
 const CHECK_INTERVAL = 1000;
 const PRELOAD_THRESHOLD = 10;
 
 const artistNames = ['DJ Coolcat', 'Funky Flamingo', 'Retro Rhapsody', 'Neon Nights', 'Synth Serenity'];
-
 const adjectives = ['Cosmic', 'Neon', 'Retro', 'Funk', 'Synth', 'Disco', 'Electric', 'Groovy', 'Smooth', 'Jazzy'];
 const nouns = ['Wave', 'Beat', 'Rhythm', 'Groove', 'Sunset', 'Dream', 'Vibes', 'Fusion', 'Harmony', 'Pulse'];
 const verbs = ['Dancing', 'Cruising', 'Floating', 'Riding', 'Chilling', 'Gliding', 'Soaring', 'Flowing', 'Grooving', 'Jamming'];
-
 
 function generateTrackName(hash) {
     const adjective = adjectives[parseInt(hash.substr(0, 2), 16) % adjectives.length];
@@ -50,9 +48,7 @@ async function fetchGenres() {
 
 async function populateGenreDropdown() {
     const genres = await fetchGenres();
-    console.log(genres);
     channelSelect.innerHTML = genres.map(genre => `<option value="${genre}">${genre}</option>`).join('');
-    console.log(channelSelect.innerHTML);
     if (genres.length > 0) {
         currentGenre = genres[0];
         channelSelect.value = currentGenre;
@@ -79,17 +75,14 @@ async function loadTrack() {
     if (!response.ok) throw new Error('Failed to fetch audio');
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
-    audio.src = url;
     
-    // Calculate Sha1 hash of the audio blob for artist and track names
     const arrayBuffer = await blob.arrayBuffer();
     const uint8_arraybuffer = new Uint8Array(arrayBuffer);
     const hashBuffer = SHA1.createHash().update(uint8_arraybuffer).digest();
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     
-    // Update track info using the hash
-    updateTrackInfo(hashHex);
+    return { url, hashHex };
 }
 
 function updateTrackInfo(hash) {
@@ -97,30 +90,37 @@ function updateTrackInfo(hash) {
     artistDisplay.textContent = selectArtistName(hash);
 }
 
-async function loadAndPlayTrack(fadeIn = true) {
-    if (isLoadingTrack) return;  // Prevent multiple calls
+async function playAudio(fadeIn = true) {
+    if (isLoadingTrack) return;
     isLoadingTrack = true;
     try {
-        await loadTrack();
+        if (nextTrackInfo) {
+            audio.src = nextTrackInfo.url;
+            updateTrackInfo(nextTrackInfo.hashHex);
+            nextTrackInfo = null;
+        } else {
+            const { url, hashHex } = await loadTrack();
+            audio.src = url;
+            updateTrackInfo(hashHex);
+        }
+
         if (fadeIn) {
             audio.volume = 0;
+            await audio.play();
+            performFadeIn();
         } else {
             audio.volume = volumeSlider.value / 100;
+            await audio.play();
         }
-        await audio.play();
         isPlaying = true;
         playPauseBtn.classList.add('active');
         playPauseBtn.textContent = 'Pause';
-        if (fadeIn) {
-            performFadeIn();
-        }
     } catch (error) {
-        console.error('Error loading track:', error);
+        console.error('Error playing audio:', error);
     } finally {
-        isLoadingTrack = false;  // Reset the flag
+        isLoadingTrack = false;
     }
 }
-
 
 function updateVolume() {
     audio.volume = volumeSlider.value / 100;
@@ -140,7 +140,7 @@ function performFadeOut() {
         if (volume === 0) {
             clearInterval(fadeOutInterval);
             audio.pause();
-            loadAndPlayTrack();
+            playAudio(true);
         }
     }, FADE_DURATION / 20);
 }
@@ -161,16 +161,19 @@ function performFadeIn() {
     }, FADE_DURATION / 20);
 }
 
-
-function checkTimeAndPreload() {
+async function checkTimeAndPreload() {
     if (audio.currentTime > 0 && audio.duration > 0) {
         const timeLeft = audio.duration - audio.currentTime;
-        if (timeLeft <= PRELOAD_THRESHOLD && !isLoadingTrack) {
-            performFadeOut();
+        if (timeLeft <= PRELOAD_THRESHOLD && !isLoadingTrack && !nextTrackInfo) {
+            try {
+                nextTrackInfo = await loadTrack();
+                performFadeOut();
+            } catch (error) {
+                console.error('Error preloading next track:', error);
+            }
         }
     }
 }
-
 
 playPauseBtn.addEventListener('click', () => {
     if (isPlaying) {
@@ -183,7 +186,7 @@ playPauseBtn.addEventListener('click', () => {
             audio.play();
             performFadeIn();
         } else {
-            loadAndPlayTrack(true);
+            playAudio(true);
         }
         isPlaying = true;
         playPauseBtn.textContent = 'Pause';
@@ -193,10 +196,11 @@ playPauseBtn.addEventListener('click', () => {
 
 channelSelect.addEventListener('change', (event) => {
     currentGenre = event.target.value;
+    nextTrackInfo = null;  // Clear any preloaded track info
     if (isPlaying) {
         performFadeOut();
     } else {
-        loadAndPlayTrack(false);
+        playAudio(false);
     }
 });
 
@@ -204,7 +208,7 @@ audio.addEventListener('timeupdate', updateProgressBar);
 
 audio.addEventListener('ended', () => {
     if (!isLoadingTrack) {
-        loadAndPlayTrack(true);
+        playAudio(true);
     }
 });
 
@@ -217,11 +221,7 @@ const socket = new WebSocket(`ws://${window.location.host}/ws`);
 socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
     if (data.type === 'visitor_count') {
-        if (data.count > 1) {
-            visitorCountElement.textContent = `${data.count} People grooving right now`;
-        } else {
-            visitorCountElement.textContent = `${data.count} Person grooving right now`;
-        }
+        visitorCountElement.textContent = `${data.count} ${data.count === 1 ? 'Person' : 'People'} grooving right now`;
     }
 };
 
@@ -232,7 +232,7 @@ socket.onclose = function(event) {
 // Initialize
 populateGenreDropdown().then(() => {
     if (currentGenre) {
-        loadTrack();
+        playAudio(false);
     }
 });
 updateVolume();
