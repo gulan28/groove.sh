@@ -1,13 +1,10 @@
 {
-    "ambient": [
-        "Generate a space-themed happy ambient beat that combines ambient cosmic sounds with downtempo rhythms. Incorporate ethereal synth textures, gentle piano melodies, and occasional subtle 'space transmission' effects to evoke the feeling of floating through a starlit void. Ensure the track has a continuous, weightless quality that induces relaxation and wonder.",
-        "Create a retro-futuristic happy ambient composition inspired by 80s sci-fi soundtracks. Blend warm analog synth tones with modern ambient percussion, adding occasional vaporwave-style effects. The track should evoke nostalgia while maintaining a futuristic edge, with a steady, calming rhythm that's perfect for focused work or relaxation."
-    ],
     "lofi": [
-        "Create a futuristic lo-fi beat that blends modern electronic elements with synthwave influences. Incorporate smooth, atmospheric synths and gentle, relaxing rhythms to evoke a sense of a serene, neon-lit future. Ensure  the track is continuous with no background noise or interruptions, maintaining a calm and tranquil atmosphere throughout while adding a touch of retro-futuristic vibes.",
-        "Create a calming lo-fi composition that blends soft, ethereal synth pads with delicate, processed piano notes. Underpin the melody with a low-key, glitch-inspired beat that adds texture without disturbing the peaceful mood. Incorporate subtle, futuristic sound design elements like gentle frequency modulations or soft granular textures to create a soothing, yet slightly alien atmosphere."
+        "Genre: Pop | Subgenre: Electronic lo-fi | Instruments: Drum Machine, Bass, Lush Synthesizer Pads, Synthesizer Arp, Synth Bass | Moods: Futuristic, Spacious, calm, relaxing, chill fi, lo-fi hip-hop, Modern | BPM: 90",
+        "Genre: Pop | Subgenre: Electronic lo-fi | Instruments: Drum Machine, Bass, Lush Synthesizer Pads, Acoustic Organ, Synth Bass | Moods: Futuristic, Spacious, Calm, Relaxing, Chill fi, lo-fi Hip-hop, Modern | BPM: 80"
     ],
     "synthwave": [
-        "Compose an energetic synthwave track that fuses synth arpeggios with laid-back guitar riffs and beats. Layer in a driving beat at 127 BPM and electronic textures to create a dynamic soundscape that feels both nostalgic and forward-looking. Aim for a continuous flow that builds in intensity, evoking images of a neon-drenched cityscape at sunrise. Ensure that the track is continuous and there are no background noises or breaks."
+        "Genre: Pop | Subgenre: Electronic | Instruments: Drum Machine, Bass, Lush Synthesizer Pads, Synthesizer Arp, Synth Bass | Moods: Futuristic, Spacious, Heart-Felt, Melancholic, Vibe, Cool, Modern | BPM: 120",
+        "Genre: Pop | Subgenre: Electronic Drum and Bass| Instruments: Drum Machine, Bass, Lush Synthesizer Pads, Synthesizer Arp, Synth Bass | Moods: Futuristic, Synthwave, Neo-Tokyo, Vibe, Cool, Modern | BPM: 140"
     ]
 }
