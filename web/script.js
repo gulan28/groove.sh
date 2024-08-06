@@ -10,6 +10,8 @@ let isPlaying = false;
 let currentGenre = '';
 let fadeOutInterval;
 let fadeInInterval;
+let isLoadingTrack = false;  // New flag to prevent multiple loadAndPlayTrack calls
+
 
 const FADE_DURATION = 5000;
 const CHECK_INTERVAL = 1000;
@@ -96,6 +98,8 @@ function updateTrackInfo(hash) {
 }
 
 async function loadAndPlayTrack(fadeIn = true) {
+    if (isLoadingTrack) return;  // Prevent multiple calls
+    isLoadingTrack = true;
     try {
         await loadTrack();
         if (fadeIn) {
@@ -112,8 +116,11 @@ async function loadAndPlayTrack(fadeIn = true) {
         }
     } catch (error) {
         console.error('Error loading track:', error);
+    } finally {
+        isLoadingTrack = false;  // Reset the flag
     }
 }
+
 
 function updateVolume() {
     audio.volume = volumeSlider.value / 100;
@@ -158,11 +165,12 @@ function performFadeIn() {
 function checkTimeAndPreload() {
     if (audio.currentTime > 0 && audio.duration > 0) {
         const timeLeft = audio.duration - audio.currentTime;
-        if (timeLeft <= PRELOAD_THRESHOLD) {
+        if (timeLeft <= PRELOAD_THRESHOLD && !isLoadingTrack) {
             performFadeOut();
         }
     }
 }
+
 
 playPauseBtn.addEventListener('click', () => {
     if (isPlaying) {
@@ -193,7 +201,12 @@ channelSelect.addEventListener('change', (event) => {
 });
 
 audio.addEventListener('timeupdate', updateProgressBar);
-audio.addEventListener('ended', () => loadAndPlayTrack(true));
+
+audio.addEventListener('ended', () => {
+    if (!isLoadingTrack) {
+        loadAndPlayTrack(true);
+    }
+});
 
 setInterval(checkTimeAndPreload, CHECK_INTERVAL);
 
