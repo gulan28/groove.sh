@@ -21,7 +21,7 @@ Once you have the API key set in the `.env` file, run
 ```
 python inference.sh <genre> <num_songs>
 ```
-Genre would be what all genres you have inside `prompts.json`. Right now it's `lofi` and `techno`
+Genre would be what all genres you have inside `prompts.json`. Right now it's `lofi` and `synthwave`
 
 This would download the songs to the music directory in the appropriate subfolders.
 
