@@ -216,7 +216,7 @@ setInterval(checkTimeAndPreload, CHECK_INTERVAL);
 
 // Add WebSocket connection and visitor count update logic
 const visitorCountElement = document.getElementById('count');
-const socket = new WebSocket(`ws://${window.location.host}/ws`);
+const socket = new WebSocket(`${location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws`);
 
 socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
