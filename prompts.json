@@ -7,5 +7,10 @@
     "synthwave": [
         "Genre: Pop | Subgenre: Electronic | Instruments: Drum Machine, Bass, Lush Synthesizer Pads, Synthesizer Arp, Synth Bass | Moods: Futuristic, Spacious, Heart-Felt, Melancholic, Vibe, Cool, Modern | BPM: 120",
         "Genre: Pop | Subgenre: Electronic Drum and Bass| Instruments: Drum Machine, Bass, Lush Synthesizer Pads, Synthesizer Arp, Synth Bass | Moods: Futuristic, Synthwave, Neo-Tokyo, Vibe, Cool, Modern | BPM: 140"
+    ],
+    "house": [
+        "Genre: House music | Subgenre: Electronic House music with Dance music influences | Instruments: Drum Machine, Bass, Lush Synthesizer Pads, Drums, House,  Accoustic Synthesizer Arp, Synth Bass | Moods: House music, Energy, Dance, Chill energy, Dance music, Drops, Happy, Euphoric | BPM: 120",
+        "Genre: Dance music | Subgenre: Electronic Dance music | Instruments: Bass, Synthesizer, Drums, House,  Accoustic Synthesizer Arp, Melodic rythms, Samba drums, Shaker, Synth Bass | Moods: House music, Happy, Euphoric, Chill, Earthy, Nature beat, Drum and Bass | BPM: 140",
+        "Genre: Jungle music | Subgenre: Electronic Jungle House music | Instruments: Bass, Big drums, Jungle noise, Synthesizer, Drums, House, Melodic rythms, Samba drums, Shaker, Synth Bass | Moods: House music, Happy, Euphoric, Chill, Earthy, Nature beat, Drum and Bass | BPM: 140"
     ]
 }
