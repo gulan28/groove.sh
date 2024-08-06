@@ -50,7 +50,11 @@ async function populateGenreDropdown() {
     const genres = await fetchGenres();
     channelSelect.innerHTML = genres.map(genre => `<option value="${genre}">${genre}</option>`).join('');
     if (genres.length > 0) {
-        currentGenre = genres[0];
+        if (genres.includes('lofi')) {
+            currentGenre = 'lofi';
+        } else {
+            currentGenre = genres[0];
+        }
         channelSelect.value = currentGenre;
     }
 }
