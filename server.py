@@ -2,6 +2,7 @@ import os
 import time
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
@@ -19,6 +20,15 @@ current_tracks = {}
 # WebSocket connections and visitor count
 active_connections: set[WebSocket] = set()
 visitor_count = 0
+
+# CORS Origins
+origins = [
+    "http://groove.sh",
+    "https://groove.sh",
+    "http://www.groove.sh",
+    "https://www.groove.sh",
+    "http://localhost:8000",
+]
 
 def get_music_files(genre):
     current_time = time.time()
@@ -63,6 +73,15 @@ async def lifespan(app: FastAPI):
     task.cancel()
 
 app = FastAPI(lifespan=lifespan)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
