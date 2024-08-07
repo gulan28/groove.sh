@@ -1,5 +1,6 @@
 const audio = new Audio();
 const playPauseBtn = document.getElementById('playPauseBtn');
+const loopBtn = document.getElementById('loopBtn');
 const channelSelect = document.getElementById('channel-select');
 const progressBar = document.getElementById('progress-bar');
 const timeDisplay = document.getElementById('time');
@@ -7,6 +8,7 @@ const trackNameDisplay = document.getElementById('track-name');
 const artistDisplay = document.getElementById('artist');
 const volumeSlider = document.getElementById('volume-slider');
 let isPlaying = false;
+let isLooping = false;
 let currentGenre = '';
 let fadeOutInterval;
 let fadeInInterval;
@@ -98,14 +100,16 @@ async function playAudio(fadeIn = true) {
     if (isLoadingTrack) return;
     isLoadingTrack = true;
     try {
-        if (nextTrackInfo) {
-            audio.src = nextTrackInfo.url;
-            updateTrackInfo(nextTrackInfo.hashHex);
-            nextTrackInfo = null;
-        } else {
-            const { url, hashHex } = await loadTrack();
-            audio.src = url;
-            updateTrackInfo(hashHex);
+        if (!isLooping || !audio.src) {
+            if (nextTrackInfo) {
+                audio.src = nextTrackInfo.url;
+                updateTrackInfo(nextTrackInfo.hashHex);
+                nextTrackInfo = null;
+            } else {
+                const { url, hashHex } = await loadTrack();
+                audio.src = url;
+                updateTrackInfo(hashHex);
+            }
         }
 
         if (fadeIn) {
@@ -168,7 +172,7 @@ function performFadeIn() {
 async function checkTimeAndPreload() {
     if (audio.currentTime > 0 && audio.duration > 0) {
         const timeLeft = audio.duration - audio.currentTime;
-        if (timeLeft <= PRELOAD_THRESHOLD && !isLoadingTrack && !nextTrackInfo) {
+        if (timeLeft <= PRELOAD_THRESHOLD && !isLoadingTrack && !nextTrackInfo && !isLooping) {
             try {
                 nextTrackInfo = await loadTrack();
                 performFadeOut();
@@ -198,9 +202,28 @@ playPauseBtn.addEventListener('click', () => {
     }
 });
 
+loopBtn.addEventListener('click', () => {
+    isLooping = !isLooping;
+    loopBtn.classList.toggle('active', isLooping);
+    if (isLooping) {
+        loopBtn.textContent = 'Unloop';
+        audio.loop = true;
+    } else {
+        loopBtn.textContent = 'Loop';
+        audio.loop = false;
+        if (isPlaying) {
+            performFadeOut();
+        }
+    }
+});
+
 channelSelect.addEventListener('change', (event) => {
     currentGenre = event.target.value;
     nextTrackInfo = null;  // Clear any preloaded track info
+    isLooping = false;  // Disable looping when changing genres
+    loopBtn.classList.remove('active');
+    loopBtn.textContent = 'Loop';
+    audio.loop = false;
     if (isPlaying) {
         performFadeOut();
     } else {
@@ -211,7 +234,7 @@ channelSelect.addEventListener('change', (event) => {
 audio.addEventListener('timeupdate', updateProgressBar);
 
 audio.addEventListener('ended', () => {
-    if (!isLoadingTrack) {
+    if (!isLoadingTrack && !isLooping) {
         playAudio(true);
     }
 });
@@ -234,9 +257,11 @@ socket.onclose = function(event) {
 };
 
 // Initialize
-populateGenreDropdown().then(() => {
+populateGenreDropdown().then(async () => {
     if (currentGenre) {
-        playAudio(false);
+        nextTrackInfo = await loadTrack();
+        audio.src = nextTrackInfo.url;
+        updateTrackInfo(nextTrackInfo.hashHex);
     }
 });
 updateVolume();
