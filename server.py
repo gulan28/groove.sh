@@ -32,7 +32,7 @@ def get_music_files(genre):
             return []
         
         music_files_cache[genre] = sorted(
-            [f for f in os.listdir(genre_path) if f.endswith(".wav")],
+            [f for f in os.listdir(genre_path) if f.endswith(".mp3")],
             key=lambda x: int(x.split(".")[0])
         )
         last_cache_time[genre] = current_time
@@ -89,7 +89,7 @@ async def get_current_track(genre: str):
         current_tracks[genre] = 1
     
     file_path = current_path / MUSIC_FOLDER / genre / music_files[current_tracks[genre] - 1]
-    return FileResponse(file_path, media_type="audio/wav")
+    return FileResponse(file_path, media_type="audio/mpeg")
 
 @app.get("/genres")
 async def list_genres():

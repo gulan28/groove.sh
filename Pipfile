@@ -10,6 +10,7 @@ python-dotenv = "*"
 ipython = "*"
 requests = "*"
 websockets = "*"
+pydub = "*"
 
 [dev-packages]
 
