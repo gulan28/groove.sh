@@ -256,12 +256,15 @@ socket.onclose = function(event) {
     console.log('WebSocket connection closed:', event);
 };
 
-// Initialize
-populateGenreDropdown().then(async () => {
+// initialize
+async function initialize() {
+    await populateGenreDropdown();
     if (currentGenre) {
         nextTrackInfo = await loadTrack();
-        audio.src = nextTrackInfo.url;
         updateTrackInfo(nextTrackInfo.hashHex);
+        // Don't set audio.src here
     }
-});
-updateVolume();
+    updateVolume();
+}
+
+initialize();
