@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import fal_client
 import threading
 import concurrent.futures
+from pydub import AudioSegment
 
 class FileNumberGenerator:
     def __init__(self):
@@ -18,29 +19,43 @@ class FileNumberGenerator:
         with self.lock:
             if self.number == 0:
                 # Initialize with the highest existing number
-                wav_files = [f for f in os.listdir(directory) if f.endswith('.wav')]
-                numbers = [int(re.search(r'\d+', f).group()) for f in wav_files if re.search(r'\d+', f)]
+                mp3_files = [f for f in os.listdir(directory) if f.endswith('.mp3')]
+                numbers = [int(re.search(r'\d+', f).group()) for f in mp3_files if re.search(r'\d+', f)]
                 self.number = max(numbers or [0])
             self.number += 1
             return self.number
 
 file_number_generator = FileNumberGenerator()
 
-def download_audio_file(url, directory):
+def convert_wav_to_mp3(wav_path, mp3_path):
+    try:
+        audio = AudioSegment.from_wav(wav_path)
+        audio.export(mp3_path, format="mp3")
+        print(f"Converted {wav_path} to {mp3_path}")
+        os.remove(wav_path)  # Remove the original WAV file
+    except Exception as e:
+        print(f"Error converting WAV to MP3: {e}")
+
+def download_and_convert_audio_file(url, directory):
     try:
         os.makedirs(directory, exist_ok=True)
         next_number = file_number_generator.get_next_number(directory)
-        output_path = os.path.join(directory, f"{next_number}.wav")
+        wav_path = os.path.join(directory, f"{next_number}.wav")
+        mp3_path = os.path.join(directory, f"{next_number}.mp3")
 
         response = requests.get(url, stream=True)
         response.raise_for_status()
 
-        with open(output_path, 'wb') as file:
+        with open(wav_path, 'wb') as file:
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
 
-        print(f"File downloaded successfully: {output_path}")
-        return output_path
+        print(f"File downloaded successfully: {wav_path}")
+        
+        # Convert WAV to MP3
+        convert_wav_to_mp3(wav_path, mp3_path)
+        
+        return mp3_path
     except requests.RequestException as e:
         print(f"Error downloading file: {e}")
         return None
@@ -59,12 +74,12 @@ def generate_and_download_song(genre, prompt, base_directory="music"):
         audio_url = result['audio_file']['url']
         
         genre_directory = os.path.join(base_directory, genre)
-        downloaded_file = download_audio_file(audio_url, genre_directory)
+        downloaded_file = download_and_convert_audio_file(audio_url, genre_directory)
         
         if downloaded_file:
-            print(f"Audio file for {genre} downloaded to: {downloaded_file}")
+            print(f"Audio file for {genre} downloaded and converted to: {downloaded_file}")
         else:
-            print(f"Failed to download the audio file for {genre}.")
+            print(f"Failed to download and convert the audio file for {genre}.")
     except Exception as e:
         print(f"Error generating song for {genre}: {e}")
 
