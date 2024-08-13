@@ -33,7 +33,7 @@ def get_music_files(genre):
         
         music_files_cache[genre] = sorted(
             [f for f in os.listdir(genre_path) if f.endswith(".mp3")],
-            key=lambda x: int(x.split(".")[0])
+            key=lambda x: x.split(".")[0]
         )
         last_cache_time[genre] = current_time
     
